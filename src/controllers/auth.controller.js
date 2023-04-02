@@ -2,15 +2,17 @@ import User from '../models/User.js'
 import Role from '../models/Role.js'
 import jwt from 'jsonwebtoken'
 import config from '../config.js'
+import Profile from '../models/Profile.js'
 
 export const SignUp = async (req, res) => {
-  const { username, email, password, roles } = req.body
+  const { emailOMobileNumber, fullname, username, password, roles } = req.body
 
   const pass = await User.encryptPassword(password)
 
   const newUser = new User({
+    emailOMobileNumber,
+    fullname,
     username,
-    email,
     password: pass
   })
 
@@ -24,17 +26,36 @@ export const SignUp = async (req, res) => {
 
   const saveUser = await newUser.save()
 
-  const token = jwt.sign({ id: saveUser._id }, config.SECRET, {
-    expiresIn: 60 * 60 * 24
+  const profile = new Profile({
+    fullname,
+    username,
+    imgProfile: '/assets/images/profile_ph.png',
+    userId: saveUser.id
   })
 
-  res.status(200).json({ id: saveUser._id, token })
+  const saveProfile = await profile.save()
+
+  const token = jwt.sign(
+    { id: saveProfile.id },
+    config.SECRET,
+    { expiresIn: 84600 }
+  )
+
+  res.status(200).json({ id: saveProfile.id, token })
 }
 
 export const SignIn = async (req, res) => {
-  const { email, password } = req.body
+  const { emailOMobileNumberOrFullName, password } = req.body
 
-  const userFound = await User.findOne({ email }).populate('roles')
+  console.log(req.body)
+
+  const userFound = await User.findOne({
+    $or: [
+      { emailOMobileNumber: emailOMobileNumberOrFullName },
+      { username: emailOMobileNumberOrFullName },
+      { fullname: emailOMobileNumberOrFullName }
+    ]
+  })
 
   if (!userFound) return res.status(400).json({ message: 'User not found' })
 
@@ -42,9 +63,13 @@ export const SignIn = async (req, res) => {
 
   if (!pass) return res.status(400).json({ message: 'Password incorrect' })
 
-  const token = jwt.sign({ id: userFound._id }, config.SECRET, {
-    expiresIn: 60 * 60 * 24
-  })
+  const profile = await Profile.findOne({ userId: userFound.id })
 
-  res.status(200).json({ id: userFound._id, token })
+  const token = jwt.sign(
+    { id: profile.id },
+    config.SECRET,
+    { expiresIn: 84600 }
+  )
+
+  res.status(200).json({ id: profile.id, token })
 }

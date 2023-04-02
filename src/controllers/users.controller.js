@@ -1,4 +1,5 @@
 import User from '../models/User.js'
+import Profile from '../models/Profile.js'
 
 export const getUsers = async (req, res) => {
   const users = await User.find({}).populate('roles',
@@ -10,9 +11,8 @@ export const getUsers = async (req, res) => {
 }
 
 export const getUserById = async (req, res) => {
-  const { userId } = req.params
-
-  const user = await User.findById(userId)
+  const profile = await Profile.findById({ _id: req.userId })
+  const user = await User.findById({ _id: profile.userId })
 
   return user
     ? res.status(200).json(user)

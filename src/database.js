@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
+import config from './config.js'
 
 dotenv.config()
 
-mongoose.connect(process.env.MONGO_DB_URI,
+mongoose.connect(config.MONGODB_URI,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true

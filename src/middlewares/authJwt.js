@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import config from '../config.js'
 import User from '../models/User.js'
+import Profile from '../models/Profile.js'
 import Role from '../models/Role.js'
 
 export const verifyToken = async (req, res, next) => {
@@ -21,7 +22,7 @@ export const verifyToken = async (req, res, next) => {
     return res.status(401).json({ message: 'Unauthorized' })
   }
 
-  const user = await User.findById(req.userId, { password: 0 })
+  const user = await Profile.findById(req.userId, { password: 0 })
 
   if (!user) return res.status(401).json({ message: "User does'nt exist" })
 
@@ -29,34 +30,24 @@ export const verifyToken = async (req, res, next) => {
 }
 
 export const isUser = async (req, res, next) => {
-  const user = await User.findById(req.userId)
+  const profile = await Profile.findById({ _id: req.userId })
+
+  const user = await User.findById({ _id: profile.userId })
 
   const roles = await Role.find({ _id: { $in: user.roles } })
 
   const isUser = roles.some(role => role.name === 'user')
-  const isModerator = roles.some(role => role.name === 'moderator')
   const isAdmin = roles.some(role => role.name === 'admin')
 
-  return isModerator || isAdmin || isUser
+  return isAdmin || isUser
     ? next()
     : res.status(403).json({ message: 'Require be member of system' })
 }
 
-export const isModerator = async (req, res, next) => {
-  const user = await User.findById(req.userId)
-
-  const roles = await Role.find({ _id: { $in: user.roles } })
-
-  const isModerator = roles.some(role => role.name === 'moderator')
-  const isAdmin = roles.some(role => role.name === 'admin')
-
-  return isModerator || isAdmin
-    ? next()
-    : res.status(403).json({ message: 'Require moderator or admin Role' })
-}
-
 export const isAdmin = async (req, res, next) => {
-  const user = await User.findById(req.userId)
+  const profile = await Profile.findById({ _id: req.userId })
+
+  const user = await User.findById({ _id: profile.userId })
 
   const roles = await Role.find({ _id: { $in: user.roles } })
 
@@ -66,4 +57,3 @@ export const isAdmin = async (req, res, next) => {
     ? next()
     : res.status(403).json({ message: 'Require admin role' })
 }
-

@@ -2,11 +2,12 @@ import { Schema, model } from 'mongoose'
 import bcrypt from 'bcryptjs'
 
 const userSchema = new Schema({
-  username: {
+  emailOMobileNumber: {
     type: String,
     unique: true
   },
-  email: {
+  fullname: String,
+  username: {
     type: String,
     unique: true
   },
@@ -23,6 +24,13 @@ const userSchema = new Schema({
   timestamps: true,
   versionKey: false
 })
+
+// userSchema.set('toJSON', {
+//   transform: (document, returnObject) => {
+//     returnObject.id = returnObject._id
+//     delete returnObject._id
+//   }
+// })
 
 // metodos estaticos
 userSchema.statics.encryptPassword = async (password) => {

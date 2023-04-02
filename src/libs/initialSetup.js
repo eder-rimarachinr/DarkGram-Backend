@@ -1,5 +1,6 @@
 import Role from '../models/Role.js'
 import User from '../models/User.js'
+import Profile from '../models/Profile.js'
 
 export const createRol = async () => {
   try {
@@ -9,7 +10,6 @@ export const createRol = async () => {
 
     const values = await Promise.all([
       new Role({ name: 'user' }).save(),
-      new Role({ name: 'moderator' }).save(),
       new Role({ name: 'admin' }).save()
     ])
     console.log(values)
@@ -26,18 +26,31 @@ export const createUserAdmin = async () => {
     if (contador > 0) return
 
     const newUser = new User({
-      username: 'joaquin',
-      email: 'eder@gmail.com'
+      emailOMobileNumber: 'ederrr2802@gmail.com',
+      fullname: 'Eder Olmedo Rimarachin Rimarachin',
+      username: 'joaquin'
     })
 
     const role = await Role.findOne({ name: 'admin' })
     newUser.roles = [role._id]
     newUser.password = await User.encryptPassword('123456')
 
+    const savedUser = await newUser.save()
+
+    console.log('User', savedUser)
+
+    const profile = new Profile({
+      fullname: savedUser.fullname,
+      username: savedUser.username,
+      imgProfile: '/assets/images/profile_ph.png',
+      userId: savedUser.id
+    })
+
     const values = await Promise.all([
-      newUser.save()
+      profile.save()
     ])
-    console.log(values)
+
+    console.log('Profile', values)
   } catch (error) {
     console.log(error)
   }
