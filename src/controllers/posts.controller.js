@@ -17,18 +17,19 @@ export const getPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   const { postId } = req.params
 
-  const post = await Post.findById({ _id: postId }).populate('user', {
-    username: 1
-  }).populate({
-    path: 'comments',
-    populate: {
-      path: 'reComment',
+  const post = await Post.findById({ _id: postId })
+    .populate('user', {
+      username: 1
+    }).populate({
+      path: 'comments',
       populate: {
         path: 'reComment',
-        maxDepth: 2 // aumenta la profundidad máxima a 3 (o el valor que necesites)
+        populate: {
+          path: 'reComment',
+          maxDepth: 2 // aumenta la profundidad máxima a 3 (o el valor que necesites)
+        }
       }
-    }
-  })
+    })
 
   res.status(200).json(post)
 }
