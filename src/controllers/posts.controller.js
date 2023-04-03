@@ -4,7 +4,12 @@ import Profile from '../models/Profile.js'
 export const getPosts = async (req, res) => {
   const posts = await Post.find({}).populate('user', {
     username: 1
-  }).populate('comments')
+  }).populate({
+    path: 'comments',
+    populate: {
+      path: 'reComment'
+    }
+  })
 
   res.status(200).json(posts)
 }
@@ -12,7 +17,18 @@ export const getPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   const { postId } = req.params
 
-  const post = await Post.findById({ _id: postId })
+  const post = await Post.findById({ _id: postId }).populate('user', {
+    username: 1
+  }).populate({
+    path: 'comments',
+    populate: {
+      path: 'reComment',
+      populate: {
+        path: 'reComment',
+        maxDepth: 2 // aumenta la profundidad máxima a 3 (o el valor que necesites)
+      }
+    }
+  })
 
   res.status(200).json(post)
 }

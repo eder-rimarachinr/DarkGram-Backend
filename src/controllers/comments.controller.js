@@ -2,7 +2,7 @@ import Comment from '../models/Comment.js'
 import Post from '../models/Post.js'
 
 export const createCommment = async (req, res) => {
-  const { postId, comment } = req.body
+  const { postId, commentId, comment } = req.body
 
   const newComment = new Comment({
     comment,
@@ -11,8 +11,11 @@ export const createCommment = async (req, res) => {
 
   const saveComment = await newComment.save()
 
-  await Post.findByIdAndUpdate(postId, { $push: { comments: saveComment._id } })
-
+  if (commentId) {
+    await Comment.findByIdAndUpdate(commentId, { $push: { reComment: saveComment._id } })
+  } else {
+    await Post.findByIdAndUpdate(postId, { $push: { comments: saveComment._id } })
+  }
   res.status(201).json(saveComment)
 }
 
