@@ -4,16 +4,21 @@ import Profile from '../models/Profile.js'
 
 export const createRol = async () => {
   try {
-    const contador = await Role.estimatedDocumentCount()
+    const contadorBefore = await Role.estimatedDocumentCount()
 
-    if (contador > 0) return
+    if (contadorBefore > 0) return
 
     const values = await Promise.all([
       new Role({ name: 'user' }).save(),
       new Role({ name: 'admin' }).save()
     ])
     console.log(values)
-    await createUserAdmin()
+
+    const contadorAfter = await Role.estimatedDocumentCount()
+
+    if (contadorAfter > 0) {
+      await createUserAdmin()
+    }
   } catch (error) {
     console.log(error)
   }
