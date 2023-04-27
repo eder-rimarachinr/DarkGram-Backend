@@ -9,6 +9,7 @@ import AuthRouter from './routes/auth.routes.js'
 import UserRouter from './routes/user.routes.js'
 import ProfileRouter from './routes/profile.routes.js'
 import CommentRouter from './routes/comments.routers.js'
+import UploadRouter from './routes/upload.router.js'
 
 const app = express()
 
@@ -24,5 +25,6 @@ app.use('/api/auth', AuthRouter)
 app.use('/api/users', UserRouter)
 app.use('/api/profile', ProfileRouter)
 app.use('/api/comments', CommentRouter)
+app.use('/api/upload', UploadRouter)
 
 export default app

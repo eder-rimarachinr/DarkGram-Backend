@@ -1,5 +1,6 @@
 import Post from '../models/Post.js'
 import Profile from '../models/Profile.js'
+import { Response } from '../libs/response.js'
 
 export const getPosts = async (req, res) => {
   const posts = await Post.find({}).populate('user', {
@@ -11,13 +12,57 @@ export const getPosts = async (req, res) => {
     }
   })
 
-  res.status(200).json(posts)
+  const response = Response(200, 'all the post', posts)
+
+  res.status(200).json(response)
+}
+
+export const getPostsByUserName = async (req, res) => {
+  const { username } = req.params
+
+  const user = await Profile.findOne({ username })
+
+  const posts = await Post.find({ user: user._id })
+    .populate('user', {
+      username: 1
+    }).populate({
+      path: 'comments',
+      populate: {
+        path: 'reComment',
+        populate: {
+          path: 'reComment',
+          maxDepth: 2
+        }
+      }
+    })
+
+  res.status(200).json(Array.isArray(posts) ? posts : [posts])
+}
+
+export const getPostsByUser = async (req, res) => {
+  const user = req.userId
+
+  const posts = await Post.findOne({ user })
+    .populate('user', {
+      username: 1
+    }).populate({
+      path: 'comments',
+      populate: {
+        path: 'reComment',
+        populate: {
+          path: 'reComment',
+          maxDepth: 2
+        }
+      }
+    })
+
+  res.status(200).json(Array.isArray(posts) ? posts : [posts])
 }
 
 export const getPostById = async (req, res) => {
   const { postId } = req.params
 
-  const post = await Post.findById({ _id: postId })
+  const posts = await Post.findById({ _id: postId })
     .populate('user', {
       username: 1
     }).populate({
@@ -31,7 +76,7 @@ export const getPostById = async (req, res) => {
       }
     })
 
-  res.status(200).json(post)
+  res.status(200).json(posts)
 }
 
 export const createPost = async (req, res) => {
@@ -57,7 +102,7 @@ export const updatePostById = async (req, res) => {
 export const deletePostById = async (req, res) => {
   const { postId } = req.params
 
-  await Post.findByIdAndDelete({ _id: postId })
+  await Post.findByIdAndRemove({ _id: postId })
 
   res.status(204).end()
 }

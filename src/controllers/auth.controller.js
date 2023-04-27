@@ -45,15 +45,15 @@ export const SignUp = async (req, res) => {
 }
 
 export const SignIn = async (req, res) => {
-  const { emailOMobileNumberOrFullName, password } = req.body
+  const { email, password } = req.body
 
   console.log(req.body)
 
   const userFound = await User.findOne({
     $or: [
-      { emailOMobileNumber: emailOMobileNumberOrFullName },
-      { username: emailOMobileNumberOrFullName },
-      { fullname: emailOMobileNumberOrFullName }
+      { emailOMobileNumber: email },
+      { username: email },
+      { fullname: email }
     ]
   })
 
