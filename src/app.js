@@ -1,6 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
+import path from 'path'
 
 import { createRol } from './libs/initialSetup.js'
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(morgan('dev'))
 
+app.use('/api/public', express.static(path.join(process.cwd(), 'src/public/uploads')))
 app.use('/api/posts', PostRouter)
 app.use('/api/auth', AuthRouter)
 app.use('/api/users', UserRouter)

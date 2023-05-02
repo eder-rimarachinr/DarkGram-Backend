@@ -5,5 +5,6 @@ dotenv.config()
 export default {
   SECRET: process.env.SECRET,
   MONGODB_URI: process.env.MONGODB_URI,
-  TIME_EXPIRE: process.env.TIME_EXPIRE
+  TIME_EXPIRE: process.env.TIME_EXPIRE,
+  PORT: process.env.PORT
 }

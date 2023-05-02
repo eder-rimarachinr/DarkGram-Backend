@@ -1,108 +1,80 @@
 import Post from '../models/Post.js'
 import Profile from '../models/Profile.js'
-import { Response } from '../libs/response.js'
+import { ResponseHeader } from '../libs/responseHeader.js'
+import {
+  addPost,
+  deletePost,
+  getAllPosts,
+  getUserIdPost,
+  getUserNamePost,
+  getUserPost,
+  updatePost
+} from '../services/posts.services.js'
+import { CODE_STATUS } from '../libs/ResponseData.js'
+
+const errorResponse = (error) => {
+  return ResponseHeader(CODE_STATUS.INTERNAL_SERVER_ERROR, error.message)
+}
 
 export const getPosts = async (req, res) => {
-  const posts = await Post.find({}).populate('user', {
-    username: 1
-  }).populate({
-    path: 'comments',
-    populate: {
-      path: 'reComment'
-    }
-  })
-
-  const response = Response(200, 'all the post', posts)
-
-  res.status(200).json(response)
+  try {
+    const response = await getAllPosts()
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }
 
 export const getPostsByUserName = async (req, res) => {
-  const { username } = req.params
-
-  const user = await Profile.findOne({ username })
-
-  const posts = await Post.find({ user: user._id })
-    .populate('user', {
-      username: 1
-    }).populate({
-      path: 'comments',
-      populate: {
-        path: 'reComment',
-        populate: {
-          path: 'reComment',
-          maxDepth: 2
-        }
-      }
-    })
-
-  res.status(200).json(Array.isArray(posts) ? posts : [posts])
+  try {
+    const response = await getUserNamePost(req)
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }
 
 export const getPostsByUser = async (req, res) => {
-  const user = req.userId
-
-  const posts = await Post.findOne({ user })
-    .populate('user', {
-      username: 1
-    }).populate({
-      path: 'comments',
-      populate: {
-        path: 'reComment',
-        populate: {
-          path: 'reComment',
-          maxDepth: 2
-        }
-      }
-    })
-
-  res.status(200).json(Array.isArray(posts) ? posts : [posts])
+  try {
+    const response = await getUserPost(req)
+    res.status(201).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }
 
 export const getPostById = async (req, res) => {
-  const { postId } = req.params
-
-  const posts = await Post.findById({ _id: postId })
-    .populate('user', {
-      username: 1
-    }).populate({
-      path: 'comments',
-      populate: {
-        path: 'reComment',
-        populate: {
-          path: 'reComment',
-          maxDepth: 2 // aumenta la profundidad máxima a 3 (o el valor que necesites)
-        }
-      }
-    })
-
-  res.status(200).json(posts)
+  try {
+    const response = await getUserIdPost(req)
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }
 
 export const createPost = async (req, res) => {
-  const { description, imgUrl } = req.body
-
-  const newPost = new Post({ description, imgUrl, user: req.userId })
-
-  const postSave = await newPost.save()
-
-  await Profile.findByIdAndUpdate(req.userId, { $push: { posts: postSave._id } })
-
-  res.status(201).json(postSave)
+  try {
+    const response = await addPost(req)
+    res.status(201).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }
 
 export const updatePostById = async (req, res) => {
-  const { postId } = req.params
-
-  const updatePost = await Post.findByIdAndUpdate({ _id: postId }, req.body, { new: true })
-
-  res.status(201).json(updatePost)
+  try {
+    const response = await updatePost(req)
+    res.status(201).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }
 
 export const deletePostById = async (req, res) => {
-  const { postId } = req.params
-
-  await Post.findByIdAndRemove({ _id: postId })
-
-  res.status(204).end()
+  try {
+    const response = await deletePost(req)
+    res.status(201).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }

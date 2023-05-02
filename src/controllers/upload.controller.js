@@ -1,4 +1,10 @@
+import { CODE_STATUS } from '../libs/ResponseData.js'
+import { ResponseHeader } from '../libs/responseHeader.js'
 import StorageModel from '../models/storage.js'
+
+const errorResponse = (error) => {
+  return ResponseHeader(CODE_STATUS.INTERNAL_SERVER_ERROR, error.message)
+}
 
 export const uploadFile = async (req, res) => {
   try {
@@ -14,8 +20,8 @@ export const uploadFile = async (req, res) => {
     const responseItem = await StorageModel.create(dataToRegister)
 
     res.send(responseItem)
-  } catch (e) {
-    res.status(404).send('Upload Error File')
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
   }
 }
 
@@ -23,8 +29,8 @@ export const getFile = async (req, res) => {
   try {
     const responseItem = await StorageModel.find({})
     res.send(responseItem)
-  } catch (e) {
-    res.status(404).send('File NOT FOUND')
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
   }
 }
 export const getFileX = async (req, res) => {
@@ -33,8 +39,8 @@ export const getFileX = async (req, res) => {
 
     const responseItem = await StorageModel.findById({ _id: fileId })
     res.send(responseItem)
-  } catch (e) {
-    res.status(404).send('File NOT FOUND')
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
   }
 }
 
@@ -42,8 +48,8 @@ export const getFileUser = async (req, res) => {
   try {
     const responseItem = await StorageModel.find({ idUser: req.userId })
     res.send(responseItem)
-  } catch (e) {
-    res.status(404).send('Filefor user NOT FOUND')
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
   }
 }
 export const getFileUserX = async (req, res) => {
@@ -52,7 +58,7 @@ export const getFileUserX = async (req, res) => {
 
     const responseItem = await StorageModel.find({ idUser: userId })
     res.send(responseItem)
-  } catch (e) {
-    res.status(404).send('Filefor user NOT FOUND')
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
   }
 }

@@ -4,7 +4,7 @@ const commentSchema = new Schema({
   comment: String,
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'Profile'
   },
   likes: [{
     type: Schema.Types.ObjectId,

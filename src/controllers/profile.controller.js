@@ -1,37 +1,25 @@
-import Profile from '../models/Profile.js'
+import { CODE_STATUS } from '../libs/ResponseData.js'
+import { ResponseHeader } from '../libs/responseHeader.js'
+import { getProfile, getUserProfile } from '../services/profile.service.js'
+
+const errorResponse = (error) => {
+  return ResponseHeader(CODE_STATUS.INTERNAL_SERVER_ERROR, error.message)
+}
 
 export const getMyProfile = async (req, res) => {
-  const myProfile = await Profile.findById(req.userId).populate('posts',
-    {
-      description: 1,
-      imgUrl: 1,
-      likes: 1,
-      comments: 1
-    })
-
-  if (!myProfile) return res.status(404).json({ message: 'The profile does not exists' })
-
-  res.status(200).json(myProfile)
+  try {
+    const response = await getProfile(req)
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }
 
 export const getProfileByUser = async (req, res) => {
-  const { username } = req.params
-
-  const profile = await Profile.findOne({
-    $or: [
-      { id: username },
-      { username }
-    ]
-  }).populate('posts',
-    {
-      description: 1,
-      imgUrl: 1,
-      likes: 1,
-      comments: 1,
-      user: 0
-    })
-
-  if (!profile) return res.status(404).json({ message: 'The profile does not exists' })
-
-  res.status(200).json(profile)
+  try {
+    const response = await getUserProfile(req)
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(error.status || 500).json(errorResponse(error))
+  }
 }

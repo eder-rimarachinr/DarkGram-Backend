@@ -51,9 +51,7 @@ export const createUserAdmin = async () => {
       userId: savedUser.id
     })
 
-    const values = await Promise.all([
-      profile.save()
-    ])
+    const values = await Promise.all([profile.save()])
 
     console.log('Profile', values)
   } catch (error) {
