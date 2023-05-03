@@ -32,7 +32,12 @@ export const SingUpUser = async ({ email, username, password }) => {
     expiresIn: 84600
   })
 
-  const response = { id: saveProfile.id, token }
+  const response = {
+    id: saveProfile.id,
+    image: saveProfile.imgProfile,
+    fullName: saveProfile.fullname,
+    token
+  }
 
   return ResponseHeader(
     CODE_STATUS.SUCCESSFULL,
@@ -49,7 +54,6 @@ export const SignInUser = async ({ email, password }) => {
       { fullname: email }
     ]
   })
-
   if (!userFound) {
     return ResponseHeader(CODE_STATUS.NOT_FOUND, MESSAGE_TYPE.NOT_FOUND)
   }
@@ -66,7 +70,12 @@ export const SignInUser = async ({ email, password }) => {
     expiresIn: 84600
   })
 
-  const response = { id: profile.id, token }
+  const response = {
+    id: profile.id,
+    image: profile.imgProfile,
+    fullName: profile.fullname,
+    token
+  }
 
   return ResponseHeader(
     CODE_STATUS.SUCCESSFULL,
