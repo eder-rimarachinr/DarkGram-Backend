@@ -185,7 +185,7 @@ export const updatePost = async (req) => {
 export const deletePost = async (req) => {
   const { postId } = req.params
   const userId = req.userId
-
+  console.log({ postId, userId })
   const isValidObjectId = mongoose.Types.ObjectId.isValid(postId)
   if (!isValidObjectId) {
     return ResponseHeader(CODE_STATUS.NOT_FOUND, MESSAGE_TYPE.NOT_FOUND)
@@ -196,7 +196,7 @@ export const deletePost = async (req) => {
     return ResponseHeader(CODE_STATUS.BAD_REQUEST, MESSAGE_TYPE.INVALID_ID)
   }
 
-  const post = await Post.findOne({ _id: postId, user: userId })
+  const post = await Post.findOne({ _id: postId })
   if (!post) {
     return ResponseHeader(CODE_STATUS.NOT_FOUND, MESSAGE_TYPE.NOT_FOUND)
   }
